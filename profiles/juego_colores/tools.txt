@@ -1,0 +1,16 @@
+# Herramientas habilitadas para el juego de colores
+# (una por línea; las líneas con # están desactivadas)
+
+detect_color
+camera
+head_tracking
+play_emotion
+dance
+move_head
+
+# No necesarias para este juego:
+# stop_dance
+# stop_emotion
+# remember
+# forget
+# idle_do_nothing
