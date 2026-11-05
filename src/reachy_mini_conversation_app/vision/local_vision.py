@@ -77,6 +77,9 @@ class VisionConfig:
     max_retries: int = 3
     retry_delay: float = 1.0
     device_preference: str = "auto"  # "auto", "cuda", "mps", "cpu"
+    # SmolVLM splits large images into many tiles; a smaller input means far fewer
+    # image tokens and much faster inference, especially on CPU.
+    max_image_side: int = int(os.getenv("LOCAL_VISION_MAX_IMAGE_SIDE", "512"))
 
 
 class VisionProcessor:
@@ -146,6 +149,9 @@ class VisionProcessor:
         processor = self.processor
         model = self.model
         rgb_image = Image.fromarray(np.ascontiguousarray(frame[..., ::-1]))
+        max_side = self.vision_config.max_image_side
+        if max_side > 0:
+            rgb_image.thumbnail((max_side, max_side))
         request_parts = [LOCAL_VISION_RESPONSE_INSTRUCTIONS]
         request_parts.insert(0, prompt_text)
         request = "\n\n".join(request_parts)

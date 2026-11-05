@@ -56,5 +56,8 @@ class Camera(Tool):
                 else {"error": "vision returned non-string"}
             )
 
-        jpeg_bytes = encode_bgr_frame_as_jpeg(frame)
-        return {"b64_im": base64.b64encode(jpeg_bytes).decode("utf-8")}
+        jpeg_bytes = await asyncio.to_thread(encode_bgr_frame_as_jpeg, frame)
+        return {
+            "b64_im": base64.b64encode(jpeg_bytes).decode("utf-8"),
+            "jpeg_bytes": len(jpeg_bytes),
+        }

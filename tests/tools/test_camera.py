@@ -62,3 +62,20 @@ async def test_camera_tool_uses_local_vision_processor_when_available() -> None:
         camera_worker.get_latest_frame.return_value,
         "What do you see?",
     )
+
+
+@pytest.mark.asyncio
+async def test_camera_tool_downscales_large_frames() -> None:
+    """Large frames are downscaled before upload to keep latency low."""
+    camera_worker = MagicMock()
+    camera_worker.get_latest_frame.return_value = np.full((1080, 1920, 3), 128, dtype=np.uint8)
+
+    deps = ToolDependencies(
+        reachy_mini=MagicMock(),
+        movement_manager=MagicMock(),
+        camera_worker=camera_worker,
+    )
+
+    result = await Camera()(deps, question="What is this?")
+    decoded = Image.open(BytesIO(base64.b64decode(result["b64_im"])))
+    assert max(decoded.size) <= 640
